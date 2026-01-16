@@ -490,17 +490,31 @@
         let searchQuery = '';
         let videoIdCounter = 1;
 
-        function loadVideos() {
-            const stored = window.storageData || {};
-            videos = stored.videos || [];
-            videoIdCounter = stored.counter || 1;
+        async function loadVideos() {
+            try {
+                const result = await window.storage.get('ernesto-hub-videos', true);
+                if (result && result.value) {
+                    const data = JSON.parse(result.value);
+                    videos = data.videos || [];
+                    videoIdCounter = data.counter || 1;
+                }
+            } catch (error) {
+                console.log('No videos yet or error loading:', error);
+                videos = [];
+                videoIdCounter = 1;
+            }
         }
 
-        function saveVideos() {
-            window.storageData = {
-                videos: videos,
-                counter: videoIdCounter
-            };
+        async function saveVideos() {
+            try {
+                await window.storage.set('ernesto-hub-videos', JSON.stringify({
+                    videos: videos,
+                    counter: videoIdCounter
+                }), true);
+            } catch (error) {
+                console.error('Error saving videos:', error);
+                alert('Error saving video. Please try again.');
+            }
         }
 
         function renderVideos() {
@@ -512,7 +526,7 @@
             });
 
             if (filtered.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 40px;">No videos found. Upload your first video!</p>';
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 40px;">No videos yet. Be the first to upload!</p>';
                 return;
             }
 
@@ -592,8 +606,12 @@
                 return;
             }
 
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+
             const reader = new FileReader();
-            reader.onload = function(event) {
+            reader.onload = async function(event) {
                 const videoData = event.target.result;
                 
                 const newVideo = {
@@ -608,15 +626,17 @@
                 };
 
                 videos.unshift(newVideo);
-                saveVideos();
+                await saveVideos();
                 renderVideos();
                 
                 document.getElementById('uploadModal').classList.remove('active');
                 document.getElementById('uploadForm').reset();
                 document.getElementById('fileName').textContent = 'No file chosen';
                 document.getElementById('previewContainer').style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Upload Video';
                 
-                alert('Video uploaded successfully!');
+                alert('Video uploaded successfully! Everyone can now see it!');
             };
             
             reader.readAsDataURL(file);
@@ -653,6 +673,15 @@
 
         loadVideos();
         renderVideos();
+
+        // Auto-refresh to show new videos from other users every 10 seconds
+        setInterval(async () => {
+            const currentLength = videos.length;
+            await loadVideos();
+            if (videos.length !== currentLength) {
+                renderVideos();
+            }
+        }, 10000);
     </script>
 </body>
 </html>
