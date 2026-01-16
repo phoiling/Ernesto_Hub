@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ernesto Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+        }
+
+        header {
+            background: #000;
+            padding: 15px 0;
+            border-bottom: 2px solid #ff6b00;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff6b00;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            min-width: 200px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #333;
+            background: #1a1a1a;
+            color: #fff;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-bar input:focus {
+            border-color: #ff6b00;
+        }
+
+        .categories {
+            background: #111;
+            padding: 15px 0;
+            border-bottom: 1px solid #222;
+        }
+
+        .categories-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+
+        .category-btn {
+            padding: 8px 20px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .category-btn:hover, .category-btn.active {
+            background: #ff6b00;
+            border-color: #ff6b00;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .video-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 107, 0, 0.3);
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, #333, #1a1a1a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .play-icon {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 107, 0, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .video-info {
+            padding: 15px;
+        }
+
+        .video-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .video-meta {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .video-category {
+            display: inline-block;
+            background: #ff6b00;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            max-width: 1000px;
+            width: 100%;
+            background: #1a1a1a;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: none;
+            color: #fff;
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .video-player {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+        }
+
+        .modal-info {
+            padding: 20px;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .modal-description {
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 24px;
+            }
+            
+            .video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="#" class="logo">Ernesto Hub</a>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search videos...">
+            </div>
+        </div>
+    </header>
+
+    <div class="categories">
+        <div class="categories-content">
+            <button class="category-btn active" data-category="all">All</button>
+            <button class="category-btn" data-category="tutorials">Tutorials</button>
+            <button class="category-btn" data-category="entertainment">Entertainment</button>
+            <button class="category-btn" data-category="education">Education</button>
+            <button class="category-btn" data-category="cooking">Cooking</button>
+            <button class="category-btn" data-category="tech">Tech</button>
+            <button class="category-btn" data-category="music">Music</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="video-grid" id="videoGrid"></div>
+    </div>
+
+    <div class="modal" id="videoModal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeModal">&times;</button>
+            <div class="video-player" id="videoPlayer"></div>
+            <div class="modal-info">
+                <h2 class="modal-title" id="modalTitle"></h2>
+                <p class="modal-description" id="modalDescription"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const videos = [
+            {
+                id: 1,
+                title: "Introduction to Web Development",
+                category: "tutorials",
+                views: "1.2M views",
+                time: "2 weeks ago",
+                description: "Learn the basics of web development including HTML, CSS, and JavaScript.",
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                id: 2,
+                title: "Amazing Cooking Techniques",
+                category: "cooking",
+                views: "850K views",
+                time: "1 month ago",
+                description: "Master professional cooking techniques used by top chefs around the world.",
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                id: 3,
+                title: "Music Production Basics",
+                category: "music",
+                views: "2.1M views",
+                time: "3 days ago",
+                description: "Everything you need to know to start producing your own music.",
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                id: 4,
+                title: "Tech Review: Latest Gadgets",
+                category: "tech",
+                views: "3.5M views",
+                time: "1 week ago",
+                description: "Comprehensive review of the newest tech gadgets on the market.",
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                id: 5,
+                title: "Comedy Sketches Compilation",
+                category: "entertainment",
+                views: "5.2M views",
+                time: "5 days ago",
+                description: "Hilarious comedy sketches that will make your day better.",
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                id: 6,
+                title: "Science Explained Simply",
+                category: "education",
+                views: "1.8M views",
+                time: "2 weeks ago",
+                description: "Complex scientific concepts broken down into easy-to-understand lessons.",
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                id: 7,
+                title: "Advanced JavaScript Tips",
+                category: "tutorials",
+                views: "920K views",
+                time: "4 days ago",
+                description: "Take your JavaScript skills to the next level with these advanced techniques.",
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            },
+            {
+                id: 8,
+                title: "Dessert Masterclass",
+                category: "cooking",
+                views: "1.5M views",
+                time: "1 week ago",
+                description: "Create professional-level desserts at home with this masterclass.",
+                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+            }
+        ];
+
+        let currentCategory = 'all';
+        let searchQuery = '';
+
+        function renderVideos() {
+            const grid = document.getElementById('videoGrid');
+            const filtered = videos.filter(video => {
+                const matchesCategory = currentCategory === 'all' || video.category === currentCategory;
+                const matchesSearch = video.title.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            grid.innerHTML = filtered.map(video => `
+                <div class="video-card" onclick="openVideo(${video.id})">
+                    <div class="video-thumbnail">
+                        <div class="play-icon">▶</div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">${video.title}</div>
+                        <div class="video-meta">${video.views} • ${video.time}</div>
+                        <span class="video-category">${video.category}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openVideo(id) {
+            const video = videos.find(v => v.id === id);
+            if (!video) return;
+
+            document.getElementById('modalTitle').textContent = video.title;
+            document.getElementById('modalDescription').textContent = video.description;
+            document.getElementById('videoPlayer').innerHTML = `
+                <iframe width="100%" height="100%" src="${video.videoUrl}" 
+                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen></iframe>
+            `;
+            document.getElementById('videoModal').classList.add('active');
+        }
+
+        function closeVideo() {
+            document.getElementById('videoModal').classList.remove('active');
+            document.getElementById('videoPlayer').innerHTML = '';
+        }
+
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentCategory = this.dataset.category;
+                renderVideos();
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            searchQuery = e.target.value;
+            renderVideos();
+        });
+
+        document.getElementById('closeModal').addEventListener('click', closeVideo);
+        
+        document.getElementById('videoModal').addEventListener('click', function(e) {
+            if (e.target === this) closeVideo();
+        });
+
+        renderVideos();
+    </script>
+</body>
+</html>
