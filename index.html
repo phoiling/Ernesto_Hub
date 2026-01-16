@@ -67,6 +67,25 @@
             border-color: #ff6b00;
         }
 
+        .upload-btn {
+            background: #ff6b00;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-btn:hover {
+            background: #ff8534;
+        }
+
         .categories {
             background: #111;
             padding: 15px 0;
@@ -137,7 +156,8 @@
             overflow: hidden;
         }
 
-        .video-thumbnail img {
+        .video-thumbnail img,
+        .video-thumbnail video {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -193,6 +213,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            overflow-y: auto;
         }
 
         .modal.active {
@@ -206,6 +227,7 @@
             border-radius: 12px;
             overflow: hidden;
             position: relative;
+            margin: auto;
         }
 
         .close-btn {
@@ -232,6 +254,11 @@
             background: #000;
         }
 
+        .video-player video {
+            width: 100%;
+            height: 100%;
+        }
+
         .modal-info {
             padding: 20px;
         }
@@ -248,6 +275,113 @@
             margin-bottom: 15px;
         }
 
+        .upload-form {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: #0a0a0a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #ff6b00;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-btn {
+            background: #333;
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: block;
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .file-input-btn:hover {
+            background: #444;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-name {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #999;
+        }
+
+        .submit-btn {
+            background: #ff6b00;
+            color: #fff;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: #ff8534;
+        }
+
+        .submit-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        .preview-container {
+            margin-top: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .preview-container video {
+            width: 100%;
+            max-height: 300px;
+        }
+
         @media (max-width: 768px) {
             .logo {
                 font-size: 24px;
@@ -256,6 +390,10 @@
             .video-grid {
                 grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
                 gap: 15px;
+            }
+
+            .upload-form {
+                padding: 20px;
             }
         }
     </style>
@@ -267,6 +405,9 @@
             <div class="search-bar">
                 <input type="text" id="searchInput" placeholder="Search videos...">
             </div>
+            <button class="upload-btn" id="uploadBtn">
+                <span>+</span> Upload Video
+            </button>
         </div>
     </header>
 
@@ -297,84 +438,70 @@
         </div>
     </div>
 
-    <script>
-        const videos = [
-            {
-                id: 1,
-                title: "Introduction to Web Development",
-                category: "tutorials",
-                views: "1.2M views",
-                time: "2 weeks ago",
-                description: "Learn the basics of web development including HTML, CSS, and JavaScript.",
-                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                id: 2,
-                title: "Amazing Cooking Techniques",
-                category: "cooking",
-                views: "850K views",
-                time: "1 month ago",
-                description: "Master professional cooking techniques used by top chefs around the world.",
-                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                id: 3,
-                title: "Music Production Basics",
-                category: "music",
-                views: "2.1M views",
-                time: "3 days ago",
-                description: "Everything you need to know to start producing your own music.",
-                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                id: 4,
-                title: "Tech Review: Latest Gadgets",
-                category: "tech",
-                views: "3.5M views",
-                time: "1 week ago",
-                description: "Comprehensive review of the newest tech gadgets on the market.",
-                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                id: 5,
-                title: "Comedy Sketches Compilation",
-                category: "entertainment",
-                views: "5.2M views",
-                time: "5 days ago",
-                description: "Hilarious comedy sketches that will make your day better.",
-                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                id: 6,
-                title: "Science Explained Simply",
-                category: "education",
-                views: "1.8M views",
-                time: "2 weeks ago",
-                description: "Complex scientific concepts broken down into easy-to-understand lessons.",
-                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                id: 7,
-                title: "Advanced JavaScript Tips",
-                category: "tutorials",
-                views: "920K views",
-                time: "4 days ago",
-                description: "Take your JavaScript skills to the next level with these advanced techniques.",
-                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            },
-            {
-                id: 8,
-                title: "Dessert Masterclass",
-                category: "cooking",
-                views: "1.5M views",
-                time: "1 week ago",
-                description: "Create professional-level desserts at home with this masterclass.",
-                videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-            }
-        ];
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeUploadModal">&times;</button>
+            <form class="upload-form" id="uploadForm">
+                <h2 style="margin-bottom: 25px;">Upload Your Video</h2>
+                
+                <div class="form-group">
+                    <label for="videoFile">Video File *</label>
+                    <div class="file-input-wrapper">
+                        <label for="videoFile" class="file-input-btn">Choose Video File</label>
+                        <input type="file" id="videoFile" accept="video/*" required>
+                    </div>
+                    <div class="file-name" id="fileName">No file chosen</div>
+                    <div class="preview-container" id="previewContainer" style="display: none;">
+                        <video id="videoPreview" controls></video>
+                    </div>
+                </div>
 
+                <div class="form-group">
+                    <label for="videoTitle">Title *</label>
+                    <input type="text" id="videoTitle" placeholder="Enter video title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="videoDescription">Description</label>
+                    <textarea id="videoDescription" placeholder="Tell viewers about your video"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="videoCategory">Category *</label>
+                    <select id="videoCategory" required>
+                        <option value="">Select a category</option>
+                        <option value="tutorials">Tutorials</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="education">Education</option>
+                        <option value="cooking">Cooking</option>
+                        <option value="tech">Tech</option>
+                        <option value="music">Music</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">Upload Video</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let videos = [];
         let currentCategory = 'all';
         let searchQuery = '';
+        let videoIdCounter = 1;
+
+        function loadVideos() {
+            const stored = window.storageData || {};
+            videos = stored.videos || [];
+            videoIdCounter = stored.counter || 1;
+        }
+
+        function saveVideos() {
+            window.storageData = {
+                videos: videos,
+                counter: videoIdCounter
+            };
+        }
 
         function renderVideos() {
             const grid = document.getElementById('videoGrid');
@@ -384,14 +511,20 @@
                 return matchesCategory && matchesSearch;
             });
 
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 40px;">No videos found. Upload your first video!</p>';
+                return;
+            }
+
             grid.innerHTML = filtered.map(video => `
                 <div class="video-card" onclick="openVideo(${video.id})">
                     <div class="video-thumbnail">
+                        ${video.thumbnailUrl ? `<video src="${video.thumbnailUrl}" muted></video>` : ''}
                         <div class="play-icon">▶</div>
                     </div>
                     <div class="video-info">
                         <div class="video-title">${video.title}</div>
-                        <div class="video-meta">${video.views} • ${video.time}</div>
+                        <div class="video-meta">${video.views || '0 views'} • ${video.time}</div>
                         <span class="video-category">${video.category}</span>
                     </div>
                 </div>
@@ -403,12 +536,17 @@
             if (!video) return;
 
             document.getElementById('modalTitle').textContent = video.title;
-            document.getElementById('modalDescription').textContent = video.description;
-            document.getElementById('videoPlayer').innerHTML = `
-                <iframe width="100%" height="100%" src="${video.videoUrl}" 
-                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowfullscreen></iframe>
-            `;
+            document.getElementById('modalDescription').textContent = video.description || 'No description';
+            
+            if (video.videoUrl) {
+                document.getElementById('videoPlayer').innerHTML = `
+                    <video width="100%" height="100%" controls autoplay>
+                        <source src="${video.videoUrl}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                `;
+            }
+            
             document.getElementById('videoModal').classList.add('active');
         }
 
@@ -416,6 +554,73 @@
             document.getElementById('videoModal').classList.remove('active');
             document.getElementById('videoPlayer').innerHTML = '';
         }
+
+        document.getElementById('uploadBtn').addEventListener('click', () => {
+            document.getElementById('uploadModal').classList.add('active');
+        });
+
+        document.getElementById('closeUploadModal').addEventListener('click', () => {
+            document.getElementById('uploadModal').classList.remove('active');
+            document.getElementById('uploadForm').reset();
+            document.getElementById('fileName').textContent = 'No file chosen';
+            document.getElementById('previewContainer').style.display = 'none';
+        });
+
+        document.getElementById('videoFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('fileName').textContent = file.name;
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const preview = document.getElementById('videoPreview');
+                    preview.src = event.target.result;
+                    document.getElementById('previewContainer').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('videoFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a video file');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const videoData = event.target.result;
+                
+                const newVideo = {
+                    id: videoIdCounter++,
+                    title: document.getElementById('videoTitle').value,
+                    description: document.getElementById('videoDescription').value,
+                    category: document.getElementById('videoCategory').value,
+                    videoUrl: videoData,
+                    thumbnailUrl: videoData,
+                    views: '0 views',
+                    time: 'Just now'
+                };
+
+                videos.unshift(newVideo);
+                saveVideos();
+                renderVideos();
+                
+                document.getElementById('uploadModal').classList.remove('active');
+                document.getElementById('uploadForm').reset();
+                document.getElementById('fileName').textContent = 'No file chosen';
+                document.getElementById('previewContainer').style.display = 'none';
+                
+                alert('Video uploaded successfully!');
+            };
+            
+            reader.readAsDataURL(file);
+        });
 
         document.querySelectorAll('.category-btn').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -437,6 +642,16 @@
             if (e.target === this) closeVideo();
         });
 
+        document.getElementById('uploadModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.remove('active');
+                document.getElementById('uploadForm').reset();
+                document.getElementById('fileName').textContent = 'No file chosen';
+                document.getElementById('previewContainer').style.display = 'none';
+            }
+        });
+
+        loadVideos();
         renderVideos();
     </script>
 </body>
