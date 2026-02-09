@@ -1,687 +1,500 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ernesto Hub</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #0a0a0a;
-            color: #fff;
-        }
-
-        header {
-            background: #000;
-            padding: 15px 0;
-            border-bottom: 2px solid #ff6b00;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #ff6b00;
-            text-decoration: none;
-            letter-spacing: 1px;
-        }
-
-        .search-bar {
-            flex: 1;
-            max-width: 500px;
-            min-width: 200px;
-        }
-
-        .search-bar input {
-            width: 100%;
-            padding: 12px 20px;
-            border: 2px solid #333;
-            background: #1a1a1a;
-            color: #fff;
-            border-radius: 25px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        .search-bar input:focus {
-            border-color: #ff6b00;
-        }
-
-        .upload-btn {
-            background: #ff6b00;
-            color: #fff;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .upload-btn:hover {
-            background: #ff8534;
-        }
-
-        .categories {
-            background: #111;
-            padding: 15px 0;
-            border-bottom: 1px solid #222;
-        }
-
-        .categories-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            scrollbar-width: thin;
-        }
-
-        .category-btn {
-            padding: 8px 20px;
-            background: #1a1a1a;
-            border: 1px solid #333;
-            color: #fff;
-            border-radius: 20px;
-            cursor: pointer;
-            white-space: nowrap;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-
-        .category-btn:hover, .category-btn.active {
-            background: #ff6b00;
-            border-color: #ff6b00;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-
-        .video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-        }
-
-        .video-card {
-            background: #1a1a1a;
-            border-radius: 12px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .video-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(255, 107, 0, 0.3);
-        }
-
-        .video-thumbnail {
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: linear-gradient(135deg, #333, #1a1a1a);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .video-thumbnail img,
-        .video-thumbnail video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .play-icon {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            background: rgba(255, 107, 0, 0.9);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .video-info {
-            padding: 15px;
-        }
-
-        .video-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            line-height: 1.3;
-        }
-
-        .video-meta {
-            font-size: 13px;
-            color: #999;
-        }
-
-        .video-category {
-            display: inline-block;
-            background: #ff6b00;
-            color: #fff;
-            padding: 2px 8px;
-            border-radius: 3px;
-            font-size: 11px;
-            margin-top: 8px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            max-width: 1000px;
-            width: 100%;
-            background: #1a1a1a;
-            border-radius: 12px;
-            overflow: hidden;
-            position: relative;
-            margin: auto;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.8);
-            border: none;
-            color: #fff;
-            font-size: 28px;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-
-        .video-player {
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: #000;
-        }
-
-        .video-player video {
-            width: 100%;
-            height: 100%;
-        }
-
-        .modal-info {
-            padding: 20px;
-        }
-
-        .modal-title {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .modal-description {
-            color: #ccc;
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-
-        .upload-form {
-            padding: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #fff;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            background: #0a0a0a;
-            border: 2px solid #333;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border-color: #ff6b00;
-        }
-
-        .form-group textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-
-        .file-input-btn {
-            background: #333;
-            color: #fff;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: block;
-            text-align: center;
-            transition: background 0.3s;
-        }
-
-        .file-input-btn:hover {
-            background: #444;
-        }
-
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: -9999px;
-        }
-
-        .file-name {
-            margin-top: 8px;
-            font-size: 13px;
-            color: #999;
-        }
-
-        .submit-btn {
-            background: #ff6b00;
-            color: #fff;
-            border: none;
-            padding: 14px 30px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.3s;
-        }
-
-        .submit-btn:hover {
-            background: #ff8534;
-        }
-
-        .submit-btn:disabled {
-            background: #555;
-            cursor: not-allowed;
-        }
-
-        .preview-container {
-            margin-top: 15px;
-            border-radius: 8px;
-            overflow: hidden;
-            background: #000;
-        }
-
-        .preview-container video {
-            width: 100%;
-            max-height: 300px;
-        }
-
-        @media (max-width: 768px) {
-            .logo {
-                font-size: 24px;
-            }
-            
-            .video-grid {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 15px;
-            }
-
-            .upload-form {
-                padding: 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <div class="header-content">
-            <a href="#" class="logo">Ernesto Hub</a>
-            <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="Search videos...">
-            </div>
-            <button class="upload-btn" id="uploadBtn">
-                <span>+</span> Upload Video
-            </button>
-        </div>
-    </header>
-
-    <div class="categories">
-        <div class="categories-content">
-            <button class="category-btn active" data-category="all">All</button>
-            <button class="category-btn" data-category="tutorials">Tutorials</button>
-            <button class="category-btn" data-category="entertainment">Entertainment</button>
-            <button class="category-btn" data-category="education">Education</button>
-            <button class="category-btn" data-category="cooking">Cooking</button>
-            <button class="category-btn" data-category="tech">Tech</button>
-            <button class="category-btn" data-category="music">Music</button>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="video-grid" id="videoGrid"></div>
-    </div>
-
-    <div class="modal" id="videoModal">
-        <div class="modal-content">
-            <button class="close-btn" id="closeModal">&times;</button>
-            <div class="video-player" id="videoPlayer"></div>
-            <div class="modal-info">
-                <h2 class="modal-title" id="modalTitle"></h2>
-                <p class="modal-description" id="modalDescription"></p>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" id="uploadModal">
-        <div class="modal-content">
-            <button class="close-btn" id="closeUploadModal">&times;</button>
-            <form class="upload-form" id="uploadForm">
-                <h2 style="margin-bottom: 25px;">Upload Your Video</h2>
-                
-                <div class="form-group">
-                    <label for="videoFile">Video File *</label>
-                    <div class="file-input-wrapper">
-                        <label for="videoFile" class="file-input-btn">Choose Video File</label>
-                        <input type="file" id="videoFile" accept="video/*" required>
-                    </div>
-                    <div class="file-name" id="fileName">No file chosen</div>
-                    <div class="preview-container" id="previewContainer" style="display: none;">
-                        <video id="videoPreview" controls></video>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="videoTitle">Title *</label>
-                    <input type="text" id="videoTitle" placeholder="Enter video title" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="videoDescription">Description</label>
-                    <textarea id="videoDescription" placeholder="Tell viewers about your video"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="videoCategory">Category *</label>
-                    <select id="videoCategory" required>
-                        <option value="">Select a category</option>
-                        <option value="tutorials">Tutorials</option>
-                        <option value="entertainment">Entertainment</option>
-                        <option value="education">Education</option>
-                        <option value="cooking">Cooking</option>
-                        <option value="tech">Tech</option>
-                        <option value="music">Music</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="submit-btn" id="submitBtn">Upload Video</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        let videos = [];
-        let currentCategory = 'all';
-        let searchQuery = '';
-        let videoIdCounter = 1;
-
-        async function loadVideos() {
-            try {
-                const result = await window.storage.get('ernesto-hub-videos', true);
-                if (result && result.value) {
-                    const data = JSON.parse(result.value);
-                    videos = data.videos || [];
-                    videoIdCounter = data.counter || 1;
-                }
-            } catch (error) {
-                console.log('No videos yet or error loading:', error);
-                videos = [];
-                videoIdCounter = 1;
-            }
-        }
-
-        async function saveVideos() {
-            try {
-                await window.storage.set('ernesto-hub-videos', JSON.stringify({
-                    videos: videos,
-                    counter: videoIdCounter
-                }), true);
-            } catch (error) {
-                console.error('Error saving videos:', error);
-                alert('Error saving video. Please try again.');
-            }
-        }
-
-        function renderVideos() {
-            const grid = document.getElementById('videoGrid');
-            const filtered = videos.filter(video => {
-                const matchesCategory = currentCategory === 'all' || video.category === currentCategory;
-                const matchesSearch = video.title.toLowerCase().includes(searchQuery.toLowerCase());
-                return matchesCategory && matchesSearch;
-            });
-
-            if (filtered.length === 0) {
-                grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 40px;">No videos yet. Be the first to upload!</p>';
-                return;
-            }
-
-            grid.innerHTML = filtered.map(video => `
-                <div class="video-card" onclick="openVideo(${video.id})">
-                    <div class="video-thumbnail">
-                        ${video.thumbnailUrl ? `<video src="${video.thumbnailUrl}" muted></video>` : ''}
-                        <div class="play-icon">▶</div>
-                    </div>
-                    <div class="video-info">
-                        <div class="video-title">${video.title}</div>
-                        <div class="video-meta">${video.views || '0 views'} • ${video.time}</div>
-                        <span class="video-category">${video.category}</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function openVideo(id) {
-            const video = videos.find(v => v.id === id);
-            if (!video) return;
-
-            document.getElementById('modalTitle').textContent = video.title;
-            document.getElementById('modalDescription').textContent = video.description || 'No description';
-            
-            if (video.videoUrl) {
-                document.getElementById('videoPlayer').innerHTML = `
-                    <video width="100%" height="100%" controls autoplay>
-                        <source src="${video.videoUrl}" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                `;
-            }
-            
-            document.getElementById('videoModal').classList.add('active');
-        }
-
-        function closeVideo() {
-            document.getElementById('videoModal').classList.remove('active');
-            document.getElementById('videoPlayer').innerHTML = '';
-        }
-
-        document.getElementById('uploadBtn').addEventListener('click', () => {
-            document.getElementById('uploadModal').classList.add('active');
-        });
-
-        document.getElementById('closeUploadModal').addEventListener('click', () => {
-            document.getElementById('uploadModal').classList.remove('active');
-            document.getElementById('uploadForm').reset();
-            document.getElementById('fileName').textContent = 'No file chosen';
-            document.getElementById('previewContainer').style.display = 'none';
-        });
-
-        document.getElementById('videoFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('fileName').textContent = file.name;
-                
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const preview = document.getElementById('videoPreview');
-                    preview.src = event.target.result;
-                    document.getElementById('previewContainer').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        document.getElementById('uploadForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const fileInput = document.getElementById('videoFile');
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                alert('Please select a video file');
-                return;
-            }
-
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Uploading...';
-
-            const reader = new FileReader();
-            reader.onload = async function(event) {
-                const videoData = event.target.result;
-                
-                const newVideo = {
-                    id: videoIdCounter++,
-                    title: document.getElementById('videoTitle').value,
-                    description: document.getElementById('videoDescription').value,
-                    category: document.getElementById('videoCategory').value,
-                    videoUrl: videoData,
-                    thumbnailUrl: videoData,
-                    views: '0 views',
-                    time: 'Just now'
-                };
-
-                videos.unshift(newVideo);
-                await saveVideos();
-                renderVideos();
-                
-                document.getElementById('uploadModal').classList.remove('active');
-                document.getElementById('uploadForm').reset();
-                document.getElementById('fileName').textContent = 'No file chosen';
-                document.getElementById('previewContainer').style.display = 'none';
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Upload Video';
-                
-                alert('Video uploaded successfully! Everyone can now see it!');
-            };
-            
-            reader.readAsDataURL(file);
-        });
-
-        document.querySelectorAll('.category-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentCategory = this.dataset.category;
-                renderVideos();
-            });
-        });
-
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            searchQuery = e.target.value;
-            renderVideos();
-        });
-
-        document.getElementById('closeModal').addEventListener('click', closeVideo);
-        
-        document.getElementById('videoModal').addEventListener('click', function(e) {
-            if (e.target === this) closeVideo();
-        });
-
-        document.getElementById('uploadModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                this.classList.remove('active');
-                document.getElementById('uploadForm').reset();
-                document.getElementById('fileName').textContent = 'No file chosen';
-                document.getElementById('previewContainer').style.display = 'none';
-            }
-        });
-
-        loadVideos();
-        renderVideos();
-
-        // Auto-refresh to show new videos from other users every 10 seconds
-        setInterval(async () => {
-            const currentLength = videos.length;
-            await loadVideos();
-            if (videos.length !== currentLength) {
-                renderVideos();
-            }
-        }, 10000);
-    </script>
-</body>
-</html>
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/index.html b/index.html
+index 0d35d739ef93375ad212f8ab9dc68a97ea4ee465..2c48d387746a1acb748cd9035e97d2ef4122f56f 100644
+--- a/index.html
++++ b/index.html
+@@ -64,56 +64,133 @@
+         }
+ 
+         .search-bar input:focus {
+             border-color: #ff6b00;
+         }
+ 
+         .upload-btn {
+             background: #ff6b00;
+             color: #fff;
+             border: none;
+             padding: 12px 24px;
+             border-radius: 25px;
+             font-size: 14px;
+             font-weight: 600;
+             cursor: pointer;
+             transition: background 0.3s;
+             display: flex;
+             align-items: center;
+             gap: 8px;
+         }
+ 
+         .upload-btn:hover {
+             background: #ff8534;
+         }
+ 
++        .user-info {
++            display: flex;
++            align-items: center;
++            gap: 10px;
++            background: #141414;
++            border: 1px solid #2b2b2b;
++            padding: 8px 14px;
++            border-radius: 25px;
++            font-size: 13px;
++            color: #fff;
++        }
++
++        .logout-btn {
++            background: transparent;
++            border: 1px solid #ff6b00;
++            color: #ff6b00;
++            padding: 6px 12px;
++            border-radius: 16px;
++            font-size: 12px;
++            cursor: pointer;
++        }
++
+         .categories {
+             background: #111;
+             padding: 15px 0;
+             border-bottom: 1px solid #222;
+         }
+ 
++        .ad-strip {
++            background: #0f0f0f;
++            border-bottom: 1px solid #222;
++            padding: 18px 0;
++        }
++
++        .ad-strip-content {
++            max-width: 1400px;
++            margin: 0 auto;
++            padding: 0 20px;
++            display: grid;
++            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
++            gap: 16px;
++        }
++
++        .ad-card {
++            background: linear-gradient(135deg, #1d1d1d, #0c0c0c);
++            border: 1px solid #2a2a2a;
++            border-radius: 12px;
++            padding: 16px;
++            display: flex;
++            flex-direction: column;
++            gap: 10px;
++            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
++        }
++
++        .ad-card .ad-label {
++            font-size: 12px;
++            letter-spacing: 1px;
++            text-transform: uppercase;
++            color: #ff6b00;
++        }
++
++        .ad-card h3 {
++            font-size: 16px;
++            margin: 0;
++        }
++
++        .ad-card p {
++            font-size: 13px;
++            color: #bfbfbf;
++            line-height: 1.5;
++        }
++
++        .ad-card button {
++            align-self: flex-start;
++            background: #ff6b00;
++            border: none;
++            color: #fff;
++            padding: 8px 16px;
++            border-radius: 18px;
++            font-weight: 600;
++            cursor: pointer;
++        }
++
+         .categories-content {
+             max-width: 1400px;
+             margin: 0 auto;
+             padding: 0 20px;
+             display: flex;
+             gap: 15px;
+             overflow-x: auto;
+             scrollbar-width: thin;
+         }
+ 
+         .category-btn {
+             padding: 8px 20px;
+             background: #1a1a1a;
+             border: 1px solid #333;
+             color: #fff;
+             border-radius: 20px;
+             cursor: pointer;
+             white-space: nowrap;
+             font-size: 14px;
+             transition: all 0.3s;
+         }
+ 
+         .category-btn:hover, .category-btn.active {
+             background: #ff6b00;
+             border-color: #ff6b00;
+@@ -360,91 +437,137 @@
+             width: 100%;
+             transition: background 0.3s;
+         }
+ 
+         .submit-btn:hover {
+             background: #ff8534;
+         }
+ 
+         .submit-btn:disabled {
+             background: #555;
+             cursor: not-allowed;
+         }
+ 
+         .preview-container {
+             margin-top: 15px;
+             border-radius: 8px;
+             overflow: hidden;
+             background: #000;
+         }
+ 
+         .preview-container video {
+             width: 100%;
+             max-height: 300px;
+         }
+ 
++        .login-modal .modal-content {
++            max-width: 480px;
++        }
++
++        .login-header {
++            padding: 30px 30px 10px;
++            text-align: center;
++        }
++
++        .login-header h2 {
++            font-size: 24px;
++            margin-bottom: 8px;
++        }
++
++        .login-header p {
++            color: #bfbfbf;
++            font-size: 14px;
++        }
++
+         @media (max-width: 768px) {
+             .logo {
+                 font-size: 24px;
+             }
+             
+             .video-grid {
+                 grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                 gap: 15px;
+             }
+ 
+             .upload-form {
+                 padding: 20px;
+             }
+         }
+     </style>
+ </head>
+ <body>
+     <header>
+         <div class="header-content">
+             <a href="#" class="logo">Ernesto Hub</a>
+             <div class="search-bar">
+                 <input type="text" id="searchInput" placeholder="Search videos...">
+             </div>
++            <div class="user-info" id="userInfo" style="display: none;">
++                <span id="welcomeUser"></span>
++                <button class="logout-btn" id="logoutBtn">Log out</button>
++            </div>
+             <button class="upload-btn" id="uploadBtn">
+                 <span>+</span> Upload Video
+             </button>
+         </div>
+     </header>
+ 
+     <div class="categories">
+         <div class="categories-content">
+             <button class="category-btn active" data-category="all">All</button>
+             <button class="category-btn" data-category="tutorials">Tutorials</button>
+             <button class="category-btn" data-category="entertainment">Entertainment</button>
+             <button class="category-btn" data-category="education">Education</button>
+             <button class="category-btn" data-category="cooking">Cooking</button>
+             <button class="category-btn" data-category="tech">Tech</button>
+             <button class="category-btn" data-category="music">Music</button>
+         </div>
+     </div>
+ 
++    <section class="ad-strip">
++        <div class="ad-strip-content">
++            <article class="ad-card">
++                <span class="ad-label">Sponsored</span>
++                <h3>Earn money with Creator Boost</h3>
++                <p>Turn your videos into revenue with auto-ads and premium placements.</p>
++                <button>Start earning</button>
++            </article>
++            <article class="ad-card">
++                <span class="ad-label">Ad Space</span>
++                <h3>Promote your brand here</h3>
++                <p>Reach Ernesto Hub fans with featured shout-outs and banner ads.</p>
++                <button>Advertise</button>
++            </article>
++            <article class="ad-card">
++                <span class="ad-label">Monetize</span>
++                <h3>Sell merch &amp; memberships</h3>
++                <p>Offer exclusive drops, subscriptions, and tip jars for superfans.</p>
++                <button>Open shop</button>
++            </article>
++        </div>
++    </section>
++
+     <div class="container">
+         <div class="video-grid" id="videoGrid"></div>
+     </div>
+ 
+     <div class="modal" id="videoModal">
+         <div class="modal-content">
+             <button class="close-btn" id="closeModal">&times;</button>
+             <div class="video-player" id="videoPlayer"></div>
+             <div class="modal-info">
+                 <h2 class="modal-title" id="modalTitle"></h2>
+                 <p class="modal-description" id="modalDescription"></p>
+             </div>
+         </div>
+     </div>
+ 
+     <div class="modal" id="uploadModal">
+         <div class="modal-content">
+             <button class="close-btn" id="closeUploadModal">&times;</button>
+             <form class="upload-form" id="uploadForm">
+                 <h2 style="margin-bottom: 25px;">Upload Your Video</h2>
+                 
+                 <div class="form-group">
+                     <label for="videoFile">Video File *</label>
+                     <div class="file-input-wrapper">
+                         <label for="videoFile" class="file-input-btn">Choose Video File</label>
+@@ -462,77 +585,102 @@
+                 </div>
+ 
+                 <div class="form-group">
+                     <label for="videoDescription">Description</label>
+                     <textarea id="videoDescription" placeholder="Tell viewers about your video"></textarea>
+                 </div>
+ 
+                 <div class="form-group">
+                     <label for="videoCategory">Category *</label>
+                     <select id="videoCategory" required>
+                         <option value="">Select a category</option>
+                         <option value="tutorials">Tutorials</option>
+                         <option value="entertainment">Entertainment</option>
+                         <option value="education">Education</option>
+                         <option value="cooking">Cooking</option>
+                         <option value="tech">Tech</option>
+                         <option value="music">Music</option>
+                     </select>
+                 </div>
+ 
+                 <button type="submit" class="submit-btn" id="submitBtn">Upload Video</button>
+             </form>
+         </div>
+     </div>
+ 
++    <div class="modal login-modal" id="loginModal">
++        <div class="modal-content">
++            <div class="login-header">
++                <h2>Welcome back</h2>
++                <p>Log in to upload, save, and monetize your videos.</p>
++            </div>
++            <form class="upload-form" id="loginForm">
++                <div class="form-group">
++                    <label for="loginName">Username</label>
++                    <input type="text" id="loginName" placeholder="Enter your username" required>
++                </div>
++                <div class="form-group">
++                    <label for="loginEmail">Email</label>
++                    <input type="email" id="loginEmail" placeholder="name@example.com" required>
++                </div>
++                <button type="submit" class="submit-btn">Log in</button>
++            </form>
++        </div>
++    </div>
++
+     <script>
+         let videos = [];
+         let currentCategory = 'all';
+         let searchQuery = '';
+         let videoIdCounter = 1;
++        const storageKey = 'ernesto-hub-videos';
++        const userKey = 'ernesto-hub-user';
+ 
+         async function loadVideos() {
+             try {
+-                const result = await window.storage.get('ernesto-hub-videos', true);
+-                if (result && result.value) {
+-                    const data = JSON.parse(result.value);
++                const stored = localStorage.getItem(storageKey);
++                if (stored) {
++                    const data = JSON.parse(stored);
+                     videos = data.videos || [];
+                     videoIdCounter = data.counter || 1;
++                } else {
++                    videos = [];
++                    videoIdCounter = 1;
+                 }
+             } catch (error) {
+                 console.log('No videos yet or error loading:', error);
+                 videos = [];
+                 videoIdCounter = 1;
+             }
+         }
+ 
+         async function saveVideos() {
+             try {
+-                await window.storage.set('ernesto-hub-videos', JSON.stringify({
++                localStorage.setItem(storageKey, JSON.stringify({
+                     videos: videos,
+                     counter: videoIdCounter
+-                }), true);
++                }));
+             } catch (error) {
+                 console.error('Error saving videos:', error);
+                 alert('Error saving video. Please try again.');
+             }
+         }
+ 
+         function renderVideos() {
+             const grid = document.getElementById('videoGrid');
+             const filtered = videos.filter(video => {
+                 const matchesCategory = currentCategory === 'all' || video.category === currentCategory;
+                 const matchesSearch = video.title.toLowerCase().includes(searchQuery.toLowerCase());
+                 return matchesCategory && matchesSearch;
+             });
+ 
+             if (filtered.length === 0) {
+                 grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 40px;">No videos yet. Be the first to upload!</p>';
+                 return;
+             }
+ 
+             grid.innerHTML = filtered.map(video => `
+                 <div class="video-card" onclick="openVideo(${video.id})">
+                     <div class="video-thumbnail">
+                         ${video.thumbnailUrl ? `<video src="${video.thumbnailUrl}" muted></video>` : ''}
+                         <div class="play-icon">▶</div>
+                     </div>
+@@ -620,68 +768,111 @@
+                     description: document.getElementById('videoDescription').value,
+                     category: document.getElementById('videoCategory').value,
+                     videoUrl: videoData,
+                     thumbnailUrl: videoData,
+                     views: '0 views',
+                     time: 'Just now'
+                 };
+ 
+                 videos.unshift(newVideo);
+                 await saveVideos();
+                 renderVideos();
+                 
+                 document.getElementById('uploadModal').classList.remove('active');
+                 document.getElementById('uploadForm').reset();
+                 document.getElementById('fileName').textContent = 'No file chosen';
+                 document.getElementById('previewContainer').style.display = 'none';
+                 submitBtn.disabled = false;
+                 submitBtn.textContent = 'Upload Video';
+                 
+                 alert('Video uploaded successfully! Everyone can now see it!');
+             };
+             
+             reader.readAsDataURL(file);
+         });
+ 
++        function updateUserUI(user) {
++            const userInfo = document.getElementById('userInfo');
++            const welcomeUser = document.getElementById('welcomeUser');
++            if (user) {
++                welcomeUser.textContent = `Hi, ${user.name}`;
++                userInfo.style.display = 'flex';
++            } else {
++                userInfo.style.display = 'none';
++            }
++        }
++
++        function showLogin() {
++            document.getElementById('loginModal').classList.add('active');
++        }
++
++        function hideLogin() {
++            document.getElementById('loginModal').classList.remove('active');
++        }
++
++        document.getElementById('loginForm').addEventListener('submit', function(e) {
++            e.preventDefault();
++            const name = document.getElementById('loginName').value.trim();
++            const email = document.getElementById('loginEmail').value.trim();
++            if (!name || !email) return;
++            const user = { name, email };
++            localStorage.setItem(userKey, JSON.stringify(user));
++            updateUserUI(user);
++            hideLogin();
++        });
++
++        document.getElementById('logoutBtn').addEventListener('click', () => {
++            localStorage.removeItem(userKey);
++            updateUserUI(null);
++            showLogin();
++        });
++
+         document.querySelectorAll('.category-btn').forEach(btn => {
+             btn.addEventListener('click', function() {
+                 document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                 this.classList.add('active');
+                 currentCategory = this.dataset.category;
+                 renderVideos();
+             });
+         });
+ 
+         document.getElementById('searchInput').addEventListener('input', function(e) {
+             searchQuery = e.target.value;
+             renderVideos();
+         });
+ 
+         document.getElementById('closeModal').addEventListener('click', closeVideo);
+         
+         document.getElementById('videoModal').addEventListener('click', function(e) {
+             if (e.target === this) closeVideo();
+         });
+ 
+         document.getElementById('uploadModal').addEventListener('click', function(e) {
+             if (e.target === this) {
+                 this.classList.remove('active');
+                 document.getElementById('uploadForm').reset();
+                 document.getElementById('fileName').textContent = 'No file chosen';
+                 document.getElementById('previewContainer').style.display = 'none';
+             }
+         });
+ 
++        const storedUser = localStorage.getItem(userKey);
++        if (storedUser) {
++            updateUserUI(JSON.parse(storedUser));
++        } else {
++            showLogin();
++        }
++
+         loadVideos();
+         renderVideos();
+ 
+         // Auto-refresh to show new videos from other users every 10 seconds
+         setInterval(async () => {
+             const currentLength = videos.length;
+             await loadVideos();
+             if (videos.length !== currentLength) {
+                 renderVideos();
+             }
+         }, 10000);
+     </script>
+ </body>
+ </html>
+ 
+EOF
+)
